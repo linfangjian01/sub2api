@@ -49,10 +49,14 @@ func (s *AntigravityGatewayService) Forward(ctx context.Context, c *gin.Context,
 	}
 
 	originalModel := claudeReq.Model
+	thinkingLevel := geminiThinkingLevelFromClaudeThinking(claudeReq.Thinking)
+	if isBareAntigravityCarbonModel(claudeReq.Model) {
+		thinkingLevel = carbonThinkingLevelFromClaudeBody(body)
+	}
 	mappedModel := s.getMappedModelForThinkingLevel(
 		account,
 		claudeReq.Model,
-		geminiThinkingLevelFromClaudeThinking(claudeReq.Thinking),
+		thinkingLevel,
 	)
 	if mappedModel == "" {
 		MarkOpsClientBusinessLimited(c, OpsClientBusinessLimitedReasonLocalFeatureGate)

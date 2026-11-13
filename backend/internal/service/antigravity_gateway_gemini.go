@@ -145,6 +145,10 @@ func (s *AntigravityGatewayService) ForwardGemini(ctx context.Context, c *gin.Co
 	}
 
 	injectedBody = ensureGeminiFunctionCallThoughtSignatures(injectedBody)
+	injectedBody, err = removeCarbonTierThinkingSelector(injectedBody, mappedModel)
+	if err != nil {
+		return nil, s.writeGoogleError(c, http.StatusBadRequest, "Invalid Carbon thinking configuration")
+	}
 
 	// 包装请求
 	wrappedBody, err := s.wrapV1InternalRequest(projectID, mappedModel, injectedBody)
