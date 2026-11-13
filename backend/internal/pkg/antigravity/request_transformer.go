@@ -698,7 +698,7 @@ func isAntigravityOpusHighTierModel(model string) bool {
 
 // carbonThinkingConfig preserves the upstream default when no effort is specified.
 // https://aistudio.google.com/docs/whats-new-gemini-4-carbon
-func carbonThinkingConfig(req *ClaudeRequest, bareModel bool) *GeminiThinkingConfig {
+func carbonThinkingConfig(req *ClaudeRequest, bareModel bool, supportsXHigh bool) *GeminiThinkingConfig {
 	cfg := &GeminiThinkingConfig{}
 	if req.Thinking != nil {
 		cfg.IncludeThoughts = req.Thinking.Type == "enabled" || req.Thinking.Type == "adaptive"
@@ -710,8 +710,14 @@ func carbonThinkingConfig(req *ClaudeRequest, bareModel bool) *GeminiThinkingCon
 				cfg.ThinkingLevel = "low"
 			case "medium":
 				cfg.ThinkingLevel = "medium"
-			case "high", "xhigh", "max":
+			case "high":
 				cfg.ThinkingLevel = "high"
+			case "xhigh", "max":
+				if supportsXHigh {
+					cfg.ThinkingLevel = "xhigh"
+				} else {
+					cfg.ThinkingLevel = "high"
+				}
 			}
 		}
 		if req.Thinking != nil {
@@ -751,12 +757,13 @@ func buildGenerationConfig(req *ClaudeRequest) *GeminiGenerationConfig {
 		config.MaxOutputTokens = req.MaxTokens
 	}
 
-	// Carbon accepts thinking levels rather than token budgets. Tiered IDs, when
-	// supplied by the account catalog, already select the level upstream.
+	// Carbon and Hydrogen accept thinking levels rather than token budgets. Tiered IDs,
+	// when supplied by the account catalog, already select the level upstream.
 	carbonModel := strings.TrimPrefix(strings.ToLower(strings.TrimSpace(req.Model)), "models/")
-	isCarbon := carbonModel == "gemini-4-carbon" || carbonModel == "gemini-4-carbon-low" || carbonModel == "gemini-4-carbon-medium" || carbonModel == "gemini-4-carbon-high"
+	isHydrogen := carbonModel == "gemini-4-hydrogen" || carbonModel == "gemini-4-hydrogen-low" || carbonModel == "gemini-4-hydrogen-medium" || carbonModel == "gemini-4-hydrogen-high" || carbonModel == "gemini-4-hydrogen-xhigh"
+	isCarbon := isHydrogen || carbonModel == "gemini-4-carbon" || carbonModel == "gemini-4-carbon-low" || carbonModel == "gemini-4-carbon-medium" || carbonModel == "gemini-4-carbon-high"
 	if isCarbon {
-		config.ThinkingConfig = carbonThinkingConfig(req, carbonModel == "gemini-4-carbon")
+		config.ThinkingConfig = carbonThinkingConfig(req, carbonModel == "gemini-4-carbon" || carbonModel == "gemini-4-hydrogen", isHydrogen)
 	}
 
 	// Thinking 配置

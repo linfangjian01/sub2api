@@ -9,22 +9,36 @@ import (
 
 func isBareAntigravityCarbonModel(model string) bool {
 	model = strings.TrimPrefix(strings.ToLower(strings.TrimSpace(model)), "models/")
-	return model == "gemini-4-carbon"
+	return model == "gemini-4-carbon" || model == "gemini-4-hydrogen"
 }
 
 func carbonThinkingLevelFromClaudeBody(body []byte) string {
-	level := geminiThinkingLevelFor("gemini-4-carbon", parseClaudeThinkingIntent(body))
+	return gemini4ThinkingLevelFromClaudeBody("gemini-4-carbon", body)
+}
+
+func gemini4ThinkingLevelFromClaudeBody(model string, body []byte) string {
+	normalized := strings.TrimPrefix(strings.ToLower(strings.TrimSpace(model)), "models/")
+	if normalized == "gemini-4-hydrogen" {
+		if strings.ToLower(strings.TrimSpace(gjson.GetBytes(body, "thinking.type").String())) != "disabled" {
+			switch strings.ToLower(strings.TrimSpace(gjson.GetBytes(body, "output_config.effort").String())) {
+			case "xhigh", "max":
+				return "xhigh"
+			}
+		}
+	}
+	level := geminiThinkingLevelFor(normalized, parseClaudeThinkingIntent(body))
 	if level == "" {
 		return "high"
 	}
 	return level
 }
 
-// The selected Antigravity Carbon model ID already determines the thinking tier.
+// The selected Antigravity Carbon/Hydrogen model ID already determines the thinking tier.
 func removeCarbonTierThinkingSelector(body []byte, mappedModel string) ([]byte, error) {
 	model := strings.TrimPrefix(strings.ToLower(strings.TrimSpace(mappedModel)), "models/")
 	switch model {
-	case "gemini-4-carbon-low", "gemini-4-carbon-medium", "gemini-4-carbon-high":
+	case "gemini-4-carbon-low", "gemini-4-carbon-medium", "gemini-4-carbon-high",
+		"gemini-4-hydrogen-low", "gemini-4-hydrogen-medium", "gemini-4-hydrogen-high", "gemini-4-hydrogen-xhigh":
 	default:
 		return body, nil
 	}

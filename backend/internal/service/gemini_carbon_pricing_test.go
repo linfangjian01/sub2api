@@ -73,3 +73,16 @@ func TestDefaultPricingIncludesGeminiCarbon(t *testing.T) {
 	require.Equal(t, float64(65536), catalog["gemini-4-carbon"]["max_output_tokens"])
 	require.Equal(t, float64(65536), catalog["gemini-4-carbon"]["max_tokens"])
 }
+
+func TestGeminiHydrogenPricingAliases(t *testing.T) {
+	base := &LiteLLMModelPricing{InputCostPerToken: 1.5e-6, OutputCostPerToken: 7.5e-6, CacheReadInputTokenCost: 0.075e-6}
+	svc := &PricingService{pricingData: map[string]*LiteLLMModelPricing{"gemini-4-hydrogen": base}}
+	for _, model := range []string{
+		"gemini-4-hydrogen", "gemini-4-hydrogen-xhigh", "gemini-4-hydrogen-high", "gemini-4-hydrogen-medium", "gemini-4-hydrogen-low", "gemini-4-hydrogen-tiered",
+		"models/gemini-4-hydrogen", "projects/p/locations/global/publishers/google/models/gemini-4-hydrogen-xhigh",
+	} {
+		t.Run(model, func(t *testing.T) {
+			require.Same(t, base, svc.GetIdentifiedModelPricing(model))
+		})
+	}
+}

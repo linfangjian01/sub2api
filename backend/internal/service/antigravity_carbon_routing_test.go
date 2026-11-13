@@ -75,3 +75,47 @@ func TestCarbonTierPreservesExplicitAccountOverride(t *testing.T) {
 		})
 	}
 }
+
+func TestHydrogenRoutesBareModelToAdvertisedTier(t *testing.T) {
+	account := &Account{
+		Platform: PlatformAntigravity,
+		Credentials: map[string]any{
+			"model_mapping": map[string]any{"claude-sonnet-4-6": "claude-sonnet-4-6"},
+		},
+	}
+	service := &AntigravityGatewayService{}
+	for _, testCase := range []struct {
+		level string
+		want  string
+	}{
+		{level: "", want: "gemini-4-hydrogen-high"},
+		{level: "low", want: "gemini-4-hydrogen-low"},
+		{level: "medium", want: "gemini-4-hydrogen-medium"},
+		{level: "high", want: "gemini-4-hydrogen-high"},
+		{level: "xhigh", want: "gemini-4-hydrogen-xhigh"},
+	} {
+		t.Run(testCase.level, func(t *testing.T) {
+			require.Equal(t, testCase.want, service.getMappedModelForThinkingLevel(account, "gemini-4-hydrogen", testCase.level))
+		})
+	}
+}
+
+func TestHydrogenClaudeEffortSelectsTier(t *testing.T) {
+	for _, testCase := range []struct {
+		name string
+		body string
+		want string
+	}{
+		{name: "default", body: `{}`, want: "high"},
+		{name: "low effort", body: `{"output_config":{"effort":"low"}}`, want: "low"},
+		{name: "medium effort", body: `{"output_config":{"effort":"medium"}}`, want: "medium"},
+		{name: "high effort", body: `{"output_config":{"effort":"high"}}`, want: "high"},
+		{name: "xhigh effort", body: `{"output_config":{"effort":"xhigh"}}`, want: "xhigh"},
+		{name: "max effort", body: `{"output_config":{"effort":"max"}}`, want: "xhigh"},
+		{name: "disabled takes precedence", body: `{"thinking":{"type":"disabled"},"output_config":{"effort":"xhigh"}}`, want: "low"},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			require.Equal(t, testCase.want, gemini4ThinkingLevelFromClaudeBody("gemini-4-hydrogen", []byte(testCase.body)))
+		})
+	}
+}

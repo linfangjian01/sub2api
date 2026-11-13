@@ -21,7 +21,7 @@ import (
 // 选中的后缀在映射表里不存在时按 high → medium → low → tiered 的顺序降级到存在的变体。
 // 显式映射（裸名本身在 model_mapping 里）始终优先，行为与现在完全一致。
 
-var geminiThinkingVariantSuffixes = []string{"-low", "-medium", "-high", "-tiered"}
+var geminiThinkingVariantSuffixes = []string{"-low", "-medium", "-high", "-xhigh", "-tiered"}
 
 const (
 	geminiThinkingBudgetLowMax    = 1024
@@ -65,6 +65,8 @@ func geminiThinkingLevelFromBody(body []byte) string {
 		return "medium"
 	case "high":
 		return "high"
+	case "xhigh", "max":
+		return "xhigh"
 	}
 	if tc.ThinkingBudget == nil {
 		return "high"
@@ -145,7 +147,7 @@ func resolveGeminiThinkingVariantForLevel(account *Account, requestedModel strin
 		preferred = "high"
 	}
 	order := []string{preferred}
-	for _, level := range []string{"high", "medium", "low", "tiered"} {
+	for _, level := range []string{"high", "xhigh", "medium", "low", "tiered"} {
 		if level != preferred {
 			order = append(order, level)
 		}

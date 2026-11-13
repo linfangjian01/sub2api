@@ -258,7 +258,7 @@ func (s *AntigravityGatewayService) prepareAntigravityCompatCall(
 
 	thinkingLevel := geminiThinkingLevelFromClaudeThinking(claudeRequest.Thinking)
 	if isBareAntigravityCarbonModel(request.originalModel) {
-		thinkingLevel = carbonThinkingLevelFromClaudeBody(request.claudeBody)
+		thinkingLevel = gemini4ThinkingLevelFromClaudeBody(request.originalModel, request.claudeBody)
 	}
 	mappedModel := s.getMappedModelForThinkingLevel(
 		account,

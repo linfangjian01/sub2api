@@ -219,6 +219,25 @@ describe('useModelWhitelist', () => {
     })
   })
 
+  it('Gemini 4 Hydrogen exposes the official API model and Antigravity tiers', () => {
+    const models = getModelsByPlatform('gemini')
+    expect(models).toContain('gemini-4-hydrogen')
+    expect(models).not.toContain('gemini-4-hydrogen-preview')
+    const antigravity = getModelsByPlatform('antigravity')
+    expect(antigravity).toEqual(expect.arrayContaining([
+      'gemini-4-hydrogen',
+      'gemini-4-hydrogen-low',
+      'gemini-4-hydrogen-medium',
+      'gemini-4-hydrogen-high',
+      'gemini-4-hydrogen-xhigh'
+    ]))
+    expect(getPresetMappingsByPlatform('antigravity')).toEqual(expect.arrayContaining([
+      expect.objectContaining({ from: 'gemini-4-hydrogen', to: 'gemini-4-hydrogen' }),
+      expect.objectContaining({ from: 'gemini-4-hydrogen-xhigh', to: 'gemini-4-hydrogen-xhigh' }),
+      expect.objectContaining({ from: 'gemini-4-hydrogen-high', to: 'gemini-4-hydrogen-high' })
+    ]))
+  })
+
   it('Gemini 4 Argon 在 gemini 与 antigravity 平台使用对应真实模型 ID 与预设映射', () => {
     expect(getModelsByPlatform('gemini')).toContain('gemini-4-argon')
     const agModels = getModelsByPlatform('antigravity')

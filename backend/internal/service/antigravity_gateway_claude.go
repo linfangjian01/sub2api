@@ -51,7 +51,7 @@ func (s *AntigravityGatewayService) Forward(ctx context.Context, c *gin.Context,
 	originalModel := claudeReq.Model
 	thinkingLevel := geminiThinkingLevelFromClaudeThinking(claudeReq.Thinking)
 	if isBareAntigravityCarbonModel(claudeReq.Model) {
-		thinkingLevel = carbonThinkingLevelFromClaudeBody(body)
+		thinkingLevel = gemini4ThinkingLevelFromClaudeBody(claudeReq.Model, body)
 	}
 	mappedModel := s.getMappedModelForThinkingLevel(
 		account,

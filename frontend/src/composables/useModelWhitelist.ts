@@ -71,7 +71,8 @@ const geminiModels = [
   'gemini-3.7-flash',
   'gemini-3.8-flash',
   'gemini-4-argon',
-  'gemini-4-carbon'
+  'gemini-4-carbon',
+  'gemini-4-hydrogen'
 ]
 
 // Antigravity 官方支持的模型（精确匹配）
@@ -129,6 +130,11 @@ const antigravityModels = [
   'gemini-3.8-flash-tiered',
   // Gemini 4 系列
   'gemini-4-carbon',
+  'gemini-4-hydrogen',
+  'gemini-4-hydrogen-low',
+  'gemini-4-hydrogen-medium',
+  'gemini-4-hydrogen-high',
+  'gemini-4-hydrogen-xhigh',
   'gemini-4-argon-low',
   'gemini-4-argon-medium',
   'gemini-4-argon-high',
@@ -405,6 +411,11 @@ const grokPresetMappings = [
 const antigravityPresetMappings = [
   // Claude 5.5 / Gemini 4 Argon / 3.8 Flash 推荐映射
   { label: '4 Carbon', from: 'gemini-4-carbon', to: 'gemini-4-carbon', color: 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400' },
+  { label: '4 Hydrogen', from: 'gemini-4-hydrogen', to: 'gemini-4-hydrogen', color: 'bg-sky-100 text-sky-700 hover:bg-sky-200 dark:bg-sky-900/30 dark:text-sky-400' },
+  { label: '4 Hydrogen XHigh', from: 'gemini-4-hydrogen-xhigh', to: 'gemini-4-hydrogen-xhigh', color: 'bg-cyan-100 text-cyan-700 hover:bg-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-400' },
+  { label: '4 Hydrogen High', from: 'gemini-4-hydrogen-high', to: 'gemini-4-hydrogen-high', color: 'bg-teal-100 text-teal-700 hover:bg-teal-200 dark:bg-teal-900/30 dark:text-teal-400' },
+  { label: '4 Hydrogen Medium', from: 'gemini-4-hydrogen-medium', to: 'gemini-4-hydrogen-medium', color: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400' },
+  { label: '4 Hydrogen Low', from: 'gemini-4-hydrogen-low', to: 'gemini-4-hydrogen-low', color: 'bg-lime-100 text-lime-700 hover:bg-lime-200 dark:bg-lime-900/30 dark:text-lime-400' },
   { label: '4 Argon→High', from: 'gemini-4-argon', to: 'gemini-4-argon-high', color: 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400' },
   { label: '4 Argon High', from: 'gemini-4-argon-high', to: 'gemini-4-argon-high', color: 'bg-orange-100 text-orange-700 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400' },
   { label: '4 Argon Medium', from: 'gemini-4-argon-medium', to: 'gemini-4-argon-medium', color: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400' },
