@@ -43,6 +43,11 @@ func WithForwardGeminiSession(groupID int64, sessionHash string) ForwardGeminiOp
 
 func (s *AntigravityGatewayService) ForwardGemini(ctx context.Context, c *gin.Context, account *Account, originalModel string, action string, stream bool, body []byte, isStickySession bool, options ...ForwardGeminiOption) (*ForwardResult, error) {
 	beginUpstreamResponseModelObservation(c)
+	rewrittenBody, rewriteErr := rewriteAntigravitySystemPrompts(c, body, antigravityPromptGemini)
+	if rewriteErr != nil {
+		return nil, s.writeGoogleError(c, http.StatusBadRequest, "Invalid system prompt")
+	}
+	body = rewrittenBody
 	startTime := time.Now()
 	forwardOpts := forwardGeminiOptions{}
 	for _, apply := range options {

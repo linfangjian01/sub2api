@@ -64,6 +64,11 @@ func (s *AntigravityGatewayService) ForwardAsChatCompletions(
 	if err := s.validateAntigravityCompatAccount(c, account); err != nil {
 		return nil, err
 	}
+	rewrittenBody, rewriteErr := rewriteAntigravitySystemPrompts(c, body, antigravityPromptChatCompletions)
+	if rewriteErr != nil {
+		return nil, s.writeAntigravityCompatError(c, http.StatusBadRequest, "invalid_request_error", "Invalid system prompt")
+	}
+	body = rewrittenBody
 
 	var request apicompat.ChatCompletionsRequest
 	if json.Unmarshal(body, &request) != nil {
@@ -111,6 +116,11 @@ func (s *AntigravityGatewayService) ForwardAsResponses(
 	if err := s.validateAntigravityCompatAccount(c, account); err != nil {
 		return nil, err
 	}
+	rewrittenBody, rewriteErr := rewriteAntigravitySystemPrompts(c, body, antigravityPromptResponses)
+	if rewriteErr != nil {
+		return nil, s.writeAntigravityCompatError(c, http.StatusBadRequest, "invalid_request_error", "Invalid system prompt")
+	}
+	body = rewrittenBody
 
 	var request apicompat.ResponsesRequest
 	if json.Unmarshal(body, &request) != nil {
