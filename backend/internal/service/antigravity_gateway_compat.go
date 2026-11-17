@@ -266,14 +266,14 @@ func (s *AntigravityGatewayService) prepareAntigravityCompatCall(
 		return nil, s.writeAntigravityCompatError(c, http.StatusBadRequest, "invalid_request_error", "Invalid request body")
 	}
 
-	thinkingLevel := geminiThinkingLevelFromClaudeThinking(claudeRequest.Thinking)
+	thinkingLevel := geminiThinkingLevelFromClaudeBody(request.claudeBody, claudeRequest.Thinking)
 	if isBareAntigravityCarbonModel(request.originalModel) {
 		thinkingLevel = gemini4ThinkingLevelFromClaudeBody(request.originalModel, request.claudeBody)
 	}
 	mappedModel := s.getMappedModelForThinkingLevel(
 		account,
 		request.originalModel,
-		geminiThinkingLevelFromClaudeBody(request.claudeBody, claudeRequest.Thinking),
+		thinkingLevel,
 	)
 	if mappedModel == "" {
 		MarkOpsClientBusinessLimited(c, OpsClientBusinessLimitedReasonLocalFeatureGate)
